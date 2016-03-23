@@ -9,17 +9,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
 
-        <activity android:name=".datausage.MainActivity">
-        </activity>
-
-        <receiver android:name="com.evolving.apploader.android.sdk.bootloader.BootCompletedReceiver" >
+        <receiver android:name="com.evolving.apploader.android.sdk.bootloader.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.evolving.apploader.android.sdk.evolvingservices.EvolvingNotifyInstall"/>
+        <service android:name="com.evolving.apploader.android.sdk.evolvingservices.EvolvingNotifyInstall" />
     </application>
 
 </manifest>

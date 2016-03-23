@@ -11,42 +11,32 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Created by vipul on 3/22/2016.
+ * Created by nupadhay on 3/23/2016.
  */
-public class GetConfigRequest extends Request<GetConfigResponse> {
-    private Response.Listener<GetConfigResponse> mListener;
+public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
+    private Response.Listener<ProvisionalOfferResponse> mListener;
 
-    String mUserAgent;
-    public GetConfigRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String userAgent) {
-        super(Method.PUT, url, listener);
+    public ProvisionalOfferRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String userAgent) {
+        super(Method.POST, url, listener);
         mListener = responseListener;
-        mUserAgent = userAgent;
+        try {
+            getHeaders().put("User-Agent", userAgent);
+        } catch (AuthFailureError authFailureError) {
+            authFailureError.printStackTrace(); //todo
+        }
+    }
 
-//        try {
-//            getHeaders().put("User-Agent", userAgent);
-//        } catch (AuthFailureError authFailureError) {
-//            authFailureError.printStackTrace(); //todo
-//        }
-    }
     @Override
-    public Map<String, String> getHeaders(){
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("User-agent", mUserAgent);
-        return headers;
-    }
-    @Override
-    protected Response<GetConfigResponse> parseNetworkResponse(NetworkResponse networkResponse) {
+    protected Response<ProvisionalOfferResponse> parseNetworkResponse(NetworkResponse networkResponse) {
         Gson gson = new Gson();
         try {
             String json = new String(
                     networkResponse.data,
                     HttpHeaderParser.parseCharset(networkResponse.headers));
             return Response.success(
-                    gson.fromJson(json, GetConfigResponse.class),
+                    gson.fromJson(json, ProvisionalOfferResponse.class),
                     HttpHeaderParser.parseCacheHeaders(networkResponse));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
@@ -56,7 +46,7 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
     }
 
     @Override
-    protected void deliverResponse(GetConfigResponse getConfigResponse) {
+    protected void deliverResponse(ProvisionalOfferResponse getConfigResponse) {
         if (mListener != null) mListener.onResponse(getConfigResponse);
     }
 
@@ -72,12 +62,11 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
             mUserAgent = useragent;
         }
 
-        public GetConfigRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
+        public ProvisionalOfferRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
             StringBuilder stringBuilder = new StringBuilder(AppLoaderConstants.BASE_URL);
-            stringBuilder.append(AppLoaderConstants.URL_GETCONFIG);
+            stringBuilder.append(AppLoaderConstants.URL_GET_PROVISIONAL_OFFER);
             stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
-            return new GetConfigRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);
+            return new ProvisionalOfferRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);
         }
     }
-
 }
