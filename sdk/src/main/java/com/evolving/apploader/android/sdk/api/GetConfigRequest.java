@@ -35,7 +35,7 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
     @Override
     public Map<String, String> getHeaders(){
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("User-agent", mUserAgent);
+        headers.put("User-agent", "Android");
         return headers;
     }
     @Override
