@@ -21,7 +21,7 @@ public class TestActivity extends Activity implements Response.Listener ,Respons
         setContentView(R.layout.main);
         mManager = new AppLoaderManager();
         mManager.init(this);
-        mManager.requestConfig("123456789123456", "1234567891", this, this);
+        mManager.requestConfig("1234567891234561234", "123456789112345", this, this);
     }
     @Override
     public void onErrorResponse(VolleyError volleyError) {

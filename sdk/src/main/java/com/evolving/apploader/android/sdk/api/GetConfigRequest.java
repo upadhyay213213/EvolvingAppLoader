@@ -25,13 +25,22 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
         super(Method.PUT, url, listener);
         mListener = responseListener;
         mUserAgent = userAgent;
-
 //        try {
 //            getHeaders().put("User-Agent", userAgent);
 //        } catch (AuthFailureError authFailureError) {
 //            authFailureError.printStackTrace(); //todo
 //        }
     }
+
+    @Override
+    protected Map<String, String> getParams() throws AuthFailureError {
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("ICCID", "1234567890123456789");
+        map.put("IMEI", "123456789012345");
+        return map;
+    }
+
     @Override
     public Map<String, String> getHeaders(){
         Map<String, String> headers = new HashMap<String, String>();
@@ -75,7 +84,7 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
         public GetConfigRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
             StringBuilder stringBuilder = new StringBuilder(AppLoaderConstants.BASE_URL);
             stringBuilder.append(AppLoaderConstants.URL_GETCONFIG);
-            stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
+//            stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
             return new GetConfigRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);
         }
     }
