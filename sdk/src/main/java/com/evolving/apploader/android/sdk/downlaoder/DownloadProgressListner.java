@@ -1,4 +1,4 @@
-package com.evolving.apploader.android.sdk.util;
+package com.evolving.apploader.android.sdk.downlaoder;
 
 
 public interface DownloadProgressListner {

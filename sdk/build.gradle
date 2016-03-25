@@ -24,4 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile project(':volley-release')
     compile('com.google.code.gson:gson:2.2.+')
+    compile 'com.google.android.gms:play-services:8.1.0'
 }

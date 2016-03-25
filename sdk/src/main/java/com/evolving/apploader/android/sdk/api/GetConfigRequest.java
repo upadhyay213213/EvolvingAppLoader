@@ -33,6 +33,12 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
     }
 
     @Override
+    public String getBodyContentType() {
+
+        return  "application/json; charset=" + this.getParamsEncoding();
+    }
+
+    @Override
     protected Map<String, String> getParams() throws AuthFailureError {
 
         HashMap<String, String> map = new HashMap<>();

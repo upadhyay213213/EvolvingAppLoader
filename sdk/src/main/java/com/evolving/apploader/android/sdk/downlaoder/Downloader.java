@@ -1,4 +1,4 @@
-package com.evolving.apploader.android.sdk.util;
+package com.evolving.apploader.android.sdk.downlaoder;
 
 import android.app.DownloadManager;
 import android.app.NotificationManager;
