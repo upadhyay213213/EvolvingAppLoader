@@ -11,6 +11,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by nupadhay on 3/23/2016.
@@ -21,11 +23,18 @@ public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
     public ProvisionalOfferRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String userAgent) {
         super(Method.POST, url, listener);
         mListener = responseListener;
-        try {
-            getHeaders().put("User-Agent", userAgent);
-        } catch (AuthFailureError authFailureError) {
-            authFailureError.printStackTrace(); //todo
-        }
+//        try {
+//            getHeaders().put("User-Agent", userAgent);
+//        } catch (AuthFailureError authFailureError) {
+//            authFailureError.printStackTrace(); //todo
+//        }
+    }
+
+    @Override
+    public Map<String, String> getHeaders(){
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put("User-agent", "Android");
+        return headers;
     }
 
     @Override
@@ -63,7 +72,7 @@ public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
         }
 
         public ProvisionalOfferRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
-            StringBuilder stringBuilder = new StringBuilder(AppLoaderConstants.BASE_URL);
+            StringBuilder stringBuilder = new StringBuilder("http://psilin8:3000/evolsdk/v1/");
             stringBuilder.append(AppLoaderConstants.URL_GET_PROVISIONAL_OFFER);
             stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
             return new ProvisionalOfferRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);

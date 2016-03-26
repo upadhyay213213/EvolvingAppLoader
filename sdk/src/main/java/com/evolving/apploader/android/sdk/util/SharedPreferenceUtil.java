@@ -3,6 +3,9 @@ package com.evolving.apploader.android.sdk.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Preferences for the application including user selected options/settings.
  * Contains function to set and get user preference data which is stored using {@link SharedPreferences}
@@ -16,6 +19,7 @@ public class SharedPreferenceUtil {
     private static final String KEY_PROJECT_ID = "project_id";
     private static final String KEY_GCM_TOPIC = "gcm_topic";
     private static final String BLANK = "";
+    private static final String APP_PACKAGE_NAME = "app_package";
 
     private static SharedPreferences sharedpreferences;
 
@@ -66,6 +70,16 @@ public class SharedPreferenceUtil {
         sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         return sharedpreferences.getInt(KEY_AD_DURATION, 50); // todo set default
     }
+    public static void setAppPackageName(Context context, Set<String> appName) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putStringSet(APP_PACKAGE_NAME, appName);
+        editor.apply();
+    }
 
+    public static Set<String> getAppPackageName(Context context) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        return sharedpreferences.getStringSet(APP_PACKAGE_NAME, Collections.<String>emptySet());
+    }
 
 }

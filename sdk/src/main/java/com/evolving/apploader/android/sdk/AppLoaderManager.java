@@ -14,6 +14,7 @@ import com.evolving.apploader.android.sdk.api.ProvisionalOfferRequest;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
 import com.evolving.apploader.android.sdk.util.AppLoaderUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -61,10 +62,9 @@ public class AppLoaderManager {
         return request;
     }
 
-    public static HashMap<String, AppDataUsage> getAppDataUsage() {
-        HashMap<String, AppDataUsage> appDataUsageHashMap = new HashMap<>();
-        // todo logic
-        return appDataUsageHashMap;
+    //This function will return the app data usage with Package name with Mobile and wifi usage
+    public static ArrayList<AppDataUsage> getAppDataUsage(Context context) {
+        return AppLoaderUtil.getAppDataUsage(context);
     }
 
     //Getting imsi value from phone

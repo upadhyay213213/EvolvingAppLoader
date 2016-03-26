@@ -25,6 +25,7 @@ public class ProvisionalOfferResponseOne implements Parcelable {
     private static final String PROVISIONAL_OFFER= "AppList";
     private String mResult ;
 
+
     public ArrayList<ProvisionalOfferResponse> getmProvisionalOffer() {
         return mProvisionalOffer;
     }

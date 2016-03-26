@@ -9,14 +9,14 @@ import android.os.Parcelable;
  */
 public class ProvisionalOfferResponse implements Parcelable {
 
-    static final Creator<GetConfigResponse> CREATOR
-            = new Creator<GetConfigResponse>() {
-        public GetConfigResponse createFromParcel(Parcel in) {
-            return new GetConfigResponse(in);
+    static final Creator<ProvisionalOfferResponse> CREATOR
+            = new Creator<ProvisionalOfferResponse>() {
+        public ProvisionalOfferResponse createFromParcel(Parcel in) {
+            return new ProvisionalOfferResponse(in);
         }
 
-        public GetConfigResponse[] newArray(int size) {
-            return new GetConfigResponse[size];
+        public ProvisionalOfferResponse[] newArray(int size) {
+            return new ProvisionalOfferResponse[size];
         }
     };
     private static final String TYPE = "TYPE";

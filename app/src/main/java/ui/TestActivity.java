@@ -20,7 +20,7 @@ public class TestActivity extends Activity implements Response.Listener ,Respons
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         AppLoaderManager.init(this);
-        AppLoaderManager.requestConfig("1234567891234561234", "123456789112345", this, this);
+        AppLoaderManager.provisionalOfferRequest("1234567891234561234", "123456789112345", this, this);
     }
     @Override
     public void onErrorResponse(VolleyError volleyError) {
