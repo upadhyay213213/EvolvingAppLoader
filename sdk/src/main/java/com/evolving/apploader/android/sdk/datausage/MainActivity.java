@@ -1,15 +1,5 @@
 package com.evolving.apploader.android.sdk.datausage;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -24,31 +14,33 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.evolving.apploader.android.sdk.R;
+import com.evolving.apploader.android.sdk.model.AppData;
+import com.evolving.apploader.android.sdk.model.TData;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class MainActivity extends Activity {
 
+	private static Context mContext;
 	TextView mTextView;
 	TableLayout table;
-	private static Context mContext; 
-	private Map<Integer, AppData> appDataList;
-	TableLayout.LayoutParams tableParams = 
-			new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, 
+	TableLayout.LayoutParams tableParams =
+			new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
 					TableLayout.LayoutParams.MATCH_PARENT);
-	TableLayout.LayoutParams rowParams = 
+	TableLayout.LayoutParams rowParams =
 			new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,
 					TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-	TableRow.LayoutParams itemParams = 
+	TableRow.LayoutParams itemParams =
 			new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
-
-
-	public enum appInterfaceTypes {
-		WIFIBG, WIFIFG, MOBBG, MOBFG
-	}
-
-	public enum mobileInterfaceTypes {
-		rmnet,pdp,ppp,uwbr,wimax,vsnet,ccmni,usb,lo,p2p0, tun0,rmnet0
-	}
-
+	private Map<Integer, AppData> appDataList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,13 +93,12 @@ public class MainActivity extends Activity {
 		t.setGravity(Gravity.CENTER | Gravity.BOTTOM);
 		if (mb > 1) {
 			t.setText(Double.toString(new BigDecimal(mb ).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue())+"MB");
-			return t; 
+			return t;
 		}
 		else if (kb > 1) {
 			t.setText(Double.toString(new BigDecimal(kb ).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue())+"KB");
 			return t;
-		}
-		else 
+		} else
 			t.setText(Long.toString(dataConsumption)+"Bytes");
 		return t;
 	}
@@ -129,7 +120,7 @@ public class MainActivity extends Activity {
 				s.append(line+"\n");
 				String items [] = line.split(" ");
 				if (items.length >= 20)
-					processRecord(items);				
+					processRecord(items);
 
 			}
 		} catch (IOException e) {
@@ -163,7 +154,7 @@ public class MainActivity extends Activity {
 				TData backGrData = new TData();
 				System.out.println("BG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
 				backGrData.setTotalData(Long.parseLong( items[5]) +  Long.parseLong( items[7]));
-				if (a.getTotalData() != null) {					
+				if (a.getTotalData() != null) {
 					if (key != null && key.equals("wifi"))
 						a.getTotalData().put(appInterfaceTypes.WIFIBG.toString(), backGrData.getTotalData());
 					else if (key != null && key.equals("mobile")) {
@@ -185,9 +176,9 @@ public class MainActivity extends Activity {
 					}
 				}
 			}
-			appDataList.put(Integer.parseInt(items[3]), a);			
+			appDataList.put(Integer.parseInt(items[3]), a);
 
-		} 
+		}
 
 	}
 
@@ -250,5 +241,13 @@ public class MainActivity extends Activity {
 		t.setGravity(Gravity.CENTER | Gravity.BOTTOM);
 		t.setText(s);
 		return t;
+	}
+
+	public enum appInterfaceTypes {
+		WIFIBG, WIFIFG, MOBBG, MOBFG
+	}
+
+	public enum mobileInterfaceTypes {
+		rmnet, pdp, ppp, uwbr, wimax, vsnet, ccmni, usb, lo, p2p0, tun0, rmnet0
 	}
 }

@@ -1,4 +1,4 @@
-package com.evolving.apploader.android.sdk.datausage;
+package com.evolving.apploader.android.sdk.model;
 
 import java.util.HashMap;
 import java.util.Map;

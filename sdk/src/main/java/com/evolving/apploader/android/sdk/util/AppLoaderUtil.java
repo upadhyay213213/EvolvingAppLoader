@@ -7,21 +7,18 @@ import android.telephony.TelephonyManager;
  */
 public class AppLoaderUtil {
     //Getting imsi value from phone
-    public String getIMSI(Context context){
+    public static String getIMSI(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        String imsi = telephonyManager.getSubscriberId();
-        return  imsi;
+        return telephonyManager.getSubscriberId();
     }
     //Getting ICCID value from phone
-    public String getICCID(Context context){
+    public static String getICCID(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        String imsi = telephonyManager.getSimSerialNumber();
-        return  imsi;
+        return telephonyManager.getSimSerialNumber();
     }
     //Getting IMEI value from phone
-    public String getIMEI(Context context){
+    public static String getIMEI(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        String imsi = telephonyManager.getDeviceId();
-        return  imsi;
+        return telephonyManager.getDeviceId();
     }
 }

@@ -1,8 +1,5 @@
-package com.evolving.apploader.android.sdk.notifyinstall;
+package com.evolving.apploader.android.sdk.broadcastreceivers;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +8,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.evolving.apploader.android.sdk.services.AppNotifyService;
+
 import java.util.List;
 
 
@@ -18,8 +17,9 @@ public class AppInstalledListener extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO Auto-generated method stub
         String action = intent.getAction();
+        String packageName = "";
+        //TODO
         if (action.equals("android.intent.action.PACKAGE_ADDED")) {
             String appNmae = getRecentInstallPackageName(intent,context);
             Log.v("appNmae:", appNmae);
@@ -30,6 +30,10 @@ public class AppInstalledListener extends BroadcastReceiver {
         if (action.equals("android.intent.action.PACKAGE_REPLACED")) {
             Log.v("DATA:", intent.getData().toString());
         }
+        Intent serviceIntent = new Intent(context, AppNotifyService.class);
+        serviceIntent.putExtra("EXTRA_PACKAGE_NAME", packageName);
+        context.startService(serviceIntent);
+
     }
 
     private String getRecentInstallPackageName(Intent intent, Context context) {
