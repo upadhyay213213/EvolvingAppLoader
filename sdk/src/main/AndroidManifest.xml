@@ -40,7 +40,7 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <!--<category android:name="androidwarriors.gcmdemo" />-->
+                <category android:name="com.evolving.apploader.android.sdk" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.evolving.apploader.android.sdk.broadcastreceivers.AppInstalledListener">
