@@ -78,7 +78,7 @@ public class DataBaseQuery {
     }
 
 
-    public static void deleteProductFromDatabase(int packageName,Context ctx) {
+    public static void deleteProductFromDatabase(String packageName,Context ctx) {
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         String query = "Delete from ProvisionalOffer WHERE Package='" + packageName+ "'";
         db.execSQL(query);

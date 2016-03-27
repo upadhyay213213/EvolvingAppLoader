@@ -56,8 +56,8 @@ public class RequestInitialConfigService extends Service {
                 SharedPreferenceUtil.setAppBaseUrl(mContext, response.getBaseUrl());
                 SharedPreferenceUtil.setGCMTopic(mContext, response.getGCMTopic());
                 SharedPreferenceUtil.setProjectId(mContext, response.getProjectId());
+                requestAppList();
                 //Todo @vipul pls check the calling isalryt
-                stopSelf();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -98,7 +98,6 @@ public class RequestInitialConfigService extends Service {
                     DataBaseQuery.addProductToDataBase(mProvisionalOffer, mContext);
                 }
                 SharedPreferenceUtil.setAppPackageName(mContext, mySet);
-
                 stopSelf();
             }
         }, new Response.ErrorListener() {

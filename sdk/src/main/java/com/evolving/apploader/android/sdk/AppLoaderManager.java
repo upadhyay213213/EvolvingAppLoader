@@ -11,7 +11,10 @@ import com.android.volley.toolbox.HurlStack;
 import com.evolving.apploader.android.sdk.api.GetConfigRequest;
 import com.evolving.apploader.android.sdk.api.NotifyAppCompleteRequest;
 import com.evolving.apploader.android.sdk.api.ProvisionalOfferRequest;
+import com.evolving.apploader.android.sdk.api.ProvisionalOfferResponse;
+import com.evolving.apploader.android.sdk.database.DataBaseQuery;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
+import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
 import com.evolving.apploader.android.sdk.util.AppLoaderUtil;
 
 import java.util.ArrayList;
@@ -81,4 +84,12 @@ public class AppLoaderManager {
     public static String getIMEI(Context context) {
         return AppLoaderUtil.getIMEI(context);
     }
+
+
+    public static ArrayList<ProvisionalOffer> getProvisionalOffer(Context context){
+        ArrayList<ProvisionalOffer> mProvisionalOffer = DataBaseQuery.getProvisionalOffer(context);
+        return  mProvisionalOffer;
+    }
+
+
 }

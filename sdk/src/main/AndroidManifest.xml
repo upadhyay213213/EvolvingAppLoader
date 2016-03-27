@@ -43,9 +43,12 @@
                 <!--<category android:name="androidwarriors.gcmdemo" />-->
             </intent-filter>
         </receiver>
-        <receiver android:name=".broadcastreceivers.AppInstalledListener">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
+        <receiver android:name="com.evolving.apploader.android.sdk.broadcastreceivers.AppInstalledListener">
+            <intent-filter android:priority="100">
+                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                <data android:scheme="package"/>
             </intent-filter>
         </receiver>
 
