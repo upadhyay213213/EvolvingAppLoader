@@ -7,8 +7,6 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.evolving.apploader.android.sdk.AppLoaderManager;
-
 /**
  * Created by nupadhay on 3/22/2016.
  */
@@ -26,7 +24,7 @@ public class AppNotifyService extends Service {
         mContext = this;
         Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
         Log.i("bootbroadcastpoc", "RequestInitialConfigService");
-        AppLoaderManager.init(mContext);
+//        AppLoaderManager.init(mContext, null);
         String packageName = pIntent.getStringExtra("EXTRA_PACKAGE_NAME");
         notifyServer(packageName);
         return super.onStartCommand(pIntent, flags, startId);

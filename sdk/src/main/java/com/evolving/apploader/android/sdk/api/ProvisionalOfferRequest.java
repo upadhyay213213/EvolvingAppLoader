@@ -1,6 +1,5 @@
 package com.evolving.apploader.android.sdk.api;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -71,8 +70,8 @@ public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
             mUserAgent = useragent;
         }
 
-        public ProvisionalOfferRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
-            StringBuilder stringBuilder = new StringBuilder("http://psilin8:3000/evolsdk/v1/");
+        public ProvisionalOfferRequest build(String baseUrl, Response.Listener listener, Response.ErrorListener errorListener) {
+            StringBuilder stringBuilder = new StringBuilder(baseUrl);
             stringBuilder.append(AppLoaderConstants.URL_GET_PROVISIONAL_OFFER);
             stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
             return new ProvisionalOfferRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);

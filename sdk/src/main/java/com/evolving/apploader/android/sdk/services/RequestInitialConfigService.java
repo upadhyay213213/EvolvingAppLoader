@@ -23,10 +23,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ *
  * Created by nupadhay on 3/22/2016.
  */
 public class RequestInitialConfigService extends Service {
 
+    private static int sRetries = 3;
     private Context mContext;
 
     @Override
@@ -39,8 +41,13 @@ public class RequestInitialConfigService extends Service {
         mContext = this;
         Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
         Log.i("bootbroadcastpoc", "RequestInitialConfigService");
-        AppLoaderManager.init(mContext);
-        requestInitialConfig();
+//        AppLoaderManager.init(mContext, null);
+        boolean repeat = pIntent.getBooleanExtra("REPEAT", false);
+        if (repeat) {
+            requestAppList();
+        } else {
+            requestInitialConfig();
+        }
         return super.onStartCommand(pIntent, flags, startId);
     }
 
@@ -50,39 +57,56 @@ public class RequestInitialConfigService extends Service {
         AppLoaderManager.requestConfig(iccid, imei, new Response.Listener() {
             @Override
             public void onResponse(Object o) {
-                if (!(o instanceof GetConfigResponse)) return; // throw error?
+                if (!(o instanceof GetConfigResponse)) {
+                    if (sRetries > 0) {
+                        sRetries--;
+                        requestInitialConfig();
+                    } else {
+                        stopSelf();
+                    }
+                    return;
+                }
                 GetConfigResponse response = (GetConfigResponse) o;
                 SharedPreferenceUtil.setAdDuration(mContext, response.getAppAdDisplayDuration());
                 SharedPreferenceUtil.setAppBaseUrl(mContext, response.getBaseUrl());
                 SharedPreferenceUtil.setGCMTopic(mContext, response.getGCMTopic());
                 SharedPreferenceUtil.setProjectId(mContext, response.getProjectId());
-                //Todo @vipul pls check the calling isalryt
-                stopSelf();
+                if (SharedPreferenceUtil.isFirstLaunch(mContext)) {
+                    SharedPreferenceUtil.setIsFirstLaunch(mContext, false);
+                }
+                requestAppList();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                // Todo @task for Nandan retry policy 3 times else stop and destroy service notify user. Please create a generic retry policy
-                //TODO which can used every where @Vipul
+                if (sRetries > 0) {
+                    sRetries--;
+                    requestInitialConfig();
+                } else {
+                    stopSelf();
+                }
             }
         });
     }
 
     private void requestAppList() {
-        /**
-         * todo
-         * Request provision list of apps and update shared preferences
-         *
-         */
         String iccid = AppLoaderUtil.getICCID(mContext);
         String imei = AppLoaderUtil.getIMEI(mContext);
         AppLoaderManager.provisionalOfferRequest(iccid, imei, new Response.Listener() {
             @Override
             public void onResponse(Object o) {
-                if (!(o instanceof ProvisionalOfferResponseOne)) return; // throw error?
+                if (!(o instanceof ProvisionalOfferResponseOne)) {
+                    if (sRetries > 0) {
+                        sRetries--;
+                        requestAppList();
+                    } else {
+                        stopSelf();
+                    }
+                    return; // throw error?
+                }
                 ProvisionalOfferResponseOne response = (ProvisionalOfferResponseOne) o;
                 //TODO how to save data in preferces as it wnt be just one package
-                Set<String> mySet = new HashSet<String>();
+                Set<String> mySet = new HashSet<>();
                 ArrayList<ProvisionalOfferResponse> mOfferList =response.getmProvisionalOffer();
                 for(int i=0; i<mOfferList.size();i++ ){
                     ProvisionalOffer mProvisionalOffer = new ProvisionalOffer();
@@ -98,14 +122,17 @@ public class RequestInitialConfigService extends Service {
                     DataBaseQuery.addProductToDataBase(mProvisionalOffer, mContext);
                 }
                 SharedPreferenceUtil.setAppPackageName(mContext, mySet);
-
                 stopSelf();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                // Todo @task for Nandan retry policy 3 times else stop and destroy service notify user. Please create a generic retry policy
-                //TODO which can used every where @Vipul
+                if (sRetries > 0) {
+                    sRetries--;
+                    requestAppList();
+                } else {
+                    stopSelf();
+                }
             }
         });
     }
