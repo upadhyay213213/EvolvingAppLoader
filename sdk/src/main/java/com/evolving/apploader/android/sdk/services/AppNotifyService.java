@@ -17,7 +17,9 @@ import com.evolving.apploader.android.sdk.util.AppLoaderUtil;
 
 import java.util.ArrayList;
 
+
 /**
+ *
  * Created by nupadhay on 3/22/2016.
  */
 public class AppNotifyService extends Service {
@@ -35,8 +37,9 @@ public class AppNotifyService extends Service {
         mContext = this;
         Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
         Log.i("bootbroadcastpoc", "RequestInitialConfigService");
-        AppLoaderManager.init(mContext);
         packageName = pIntent.getStringExtra("EXTRA_PACKAGE_NAME");
+        notifyServer(mContext, packageName);
+//        AppLoaderManager.init(mContext, null);
         notifyServer(mContext, packageName);
         return super.onStartCommand(pIntent, flags, startId);
     }

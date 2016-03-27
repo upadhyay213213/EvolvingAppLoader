@@ -4,12 +4,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
-import android.widget.TableRow;
 
-import com.evolving.apploader.android.sdk.datausage.MainActivity;
-import com.evolving.apploader.android.sdk.model.AppData;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
-import com.evolving.apploader.android.sdk.model.TData;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,7 +20,8 @@ import java.util.Map;
  */
 public class AppLoaderUtil {
 
-    private static  Map<Integer, AppData> appDataList= new HashMap<Integer, AppData>();
+    private static Map<Integer, AppDataUsage> appDataList = new HashMap<>();
+
     //Getting imsi value from phone
     public static String getIMSI(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -42,22 +39,12 @@ public class AppLoaderUtil {
     }
 
     public static ArrayList<AppDataUsage> getAppDataUsage(Context context) {
-        ArrayList<AppDataUsage> appDataUsageHashMap = new ArrayList<>();
         prepareAppDataList(context);
         processStatsFile();
-        for (Map.Entry<Integer, AppData> entry : appDataList.entrySet()) {
-            if (entry.getValue() != null && !entry.getValue().getTotalData().isEmpty()) {
-                AppDataUsage app = new AppDataUsage();
-                app.setmAppPackageName(entry.getValue().getAppName());
-                app.setmMobileData(entry.getValue().getDataConsumption("mobile"));
-                app.setmWifiData(entry.getValue().getDataConsumption("WIFI"));
-                appDataUsageHashMap.add(app);
-            }
-        }
-        return appDataUsageHashMap;
+        return new ArrayList<>(appDataList.values());
     }
 
-    private static  String processStatsFile() {
+    private static String processStatsFile() {
         StringBuilder s = new StringBuilder();
         String line;
         File netFile = new File("/proc/net/xt_qtaguid/stats");
@@ -96,12 +83,13 @@ public class AppLoaderUtil {
         PackageManager pm = mContext.getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo a: packages) {
-            AppData ad = new AppData();
-            ad.setAppName(pm.getApplicationLabel(a).toString());
-            ad.setAppID(a.uid);
+            AppDataUsage appDataUsage = new AppDataUsage();
+            appDataUsage.setAppName(a.name);
+            appDataUsage.setmAppPackageName(a.packageName);
+            appDataUsage.setAppId(a.uid);
             if (a.uid >= 10000)
-                appDataList.put(a.uid, ad);
-            System.out.println("package name:"+a.packageName +" ID:"+a.uid);
+                appDataList.put(a.uid, appDataUsage);
+            System.out.println("app name = " + a.name + " package name:" + a.packageName + " ID:" + a.uid);
         }
     }
 
@@ -136,7 +124,7 @@ public class AppLoaderUtil {
     }
 
     private static void processRecord(String[] items) {
-        AppData a = null;
+        AppDataUsage a = null;
         String key = getKey(items);
 
         System.out.println("items:  "+items[3]);
@@ -148,38 +136,20 @@ public class AppLoaderUtil {
         if (a != null) {
             System.out.println(a.getAppName());
             System.out.println(Long.parseLong( items[4]));
-            if (Long.parseLong( items[4]) == 0) {
-                TData backGrData = new TData();
-                System.out.println("BG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
-                backGrData.setTotalData(Long.parseLong( items[5]) +  Long.parseLong( items[7]));
-                if (a.getTotalData() != null) {
-                    if (key != null && key.equals("wifi"))
-                        a.getTotalData().put(appInterfaceTypes.WIFIBG.toString(), backGrData.getTotalData());
-                    else if (key != null && key.equals("mobile")) {
-                        a.getTotalData().put(MainActivity.appInterfaceTypes.MOBBG.toString(), backGrData.getTotalData());
-                    }
-                }
-
+            if (Long.parseLong(items[4]) == 0) {
+                System.out.println("BG data:" + a.getAppName() + "  data:" + Long.parseLong(items[5]) + Long.parseLong(items[7]));
             } else {
-                TData fGrData = new TData();
-                fGrData.setRecBytes(items[5]);
-                fGrData.setSentBytes(items[7]);
                 System.out.println("FG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
-                fGrData.setTotalData(Long.parseLong( items[5]) +  Long.parseLong( items[7]));
-                if (a.getTotalData() != null) {
-                    if (key != null && key.equals("wifi"))
-                        a.getTotalData().put(appInterfaceTypes.WIFIFG.toString(), fGrData.getTotalData());
-                    else if (key != null && key.equals("mobile")) {
-                        a.getTotalData().put(appInterfaceTypes.MOBFG.toString(), fGrData.getTotalData());
-                    }
-                }
+
+            }
+            if (key != null && key.equals("wifi"))
+                a.setmWifiData(Long.parseLong(items[5]) + Long.parseLong(items[7]));
+            else if (key != null && key.equals("mobile")) {
+                a.setmMobileData(Long.parseLong(items[5]) + Long.parseLong(items[7]));
             }
             appDataList.put(Integer.parseInt(items[3]), a);
 
         }
 
-    }
-    public enum appInterfaceTypes {
-        WIFIBG, WIFIFG, MOBBG, MOBFG
     }
 }

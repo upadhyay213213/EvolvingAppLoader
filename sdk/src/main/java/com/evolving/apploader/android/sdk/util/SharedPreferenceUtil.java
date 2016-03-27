@@ -20,6 +20,8 @@ public class SharedPreferenceUtil {
     private static final String KEY_GCM_TOPIC = "gcm_topic";
     private static final String BLANK = "";
     private static final String APP_PACKAGE_NAME = "app_package";
+    private static final String IS_FIRST_LAUNCH = "is_first_launch";
+    private static final String SCHEDULE_TIME = "schedule_time";
 
     private static SharedPreferences sharedpreferences;
 
@@ -82,4 +84,27 @@ public class SharedPreferenceUtil {
         return sharedpreferences.getStringSet(APP_PACKAGE_NAME, Collections.<String>emptySet());
     }
 
+    public static void setIsFirstLaunch(Context context, boolean first) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putBoolean(IS_FIRST_LAUNCH, first);
+        editor.apply();
+    }
+
+    public static boolean isFirstLaunch(Context context) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        return sharedpreferences.getBoolean(IS_FIRST_LAUNCH, true);
+    }
+
+    public static void setScheduleTime(Context context, long millis) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putLong(SCHEDULE_TIME, millis);
+        editor.apply();
+    }
+
+    public static long getScheduleTime(Context context) {
+        sharedpreferences = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        return sharedpreferences.getLong(SCHEDULE_TIME, 24 * 60 * 60 * 1000);
+    }
 }

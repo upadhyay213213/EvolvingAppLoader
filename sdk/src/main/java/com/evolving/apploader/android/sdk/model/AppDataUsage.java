@@ -1,39 +1,39 @@
 package com.evolving.apploader.android.sdk.model;
 
-/**
- * Created by vipul on 3/26/2016.
- */
-public class AppDataUsage {
-    private String mAppName;
+import android.support.annotation.NonNull;
 
-    public int getmAppId() {
+/**
+ */
+public class AppDataUsage implements Comparable<AppDataUsage> {
+    private String mAppName;
+    private String mAppPackageName;
+    private int mAppId;
+    private Long mMobileData;
+    private Long mWifiData;
+
+    public int getAppId() {
         return mAppId;
     }
 
-    public void setmAppId(int mAppId) {
+    public void setAppId(int mAppId) {
         this.mAppId = mAppId;
     }
 
-    public String getmAppName() {
+    public String getAppName() {
         return mAppName;
     }
 
-    public void setmAppName(String mAppName) {
+    public void setAppName(String mAppName) {
         this.mAppName = mAppName;
     }
 
-    public String getmAppPackageName() {
+    public String getAppPackageName() {
         return mAppPackageName;
     }
 
     public void setmAppPackageName(String mAppPackageName) {
         this.mAppPackageName = mAppPackageName;
     }
-
-
-
-    private String mAppPackageName;
-    private int mAppId;
 
     public Long getmMobileData() {
         return mMobileData;
@@ -43,8 +43,6 @@ public class AppDataUsage {
         this.mMobileData = mMobileData;
     }
 
-    private Long mMobileData;
-
     public Long getmWifiData() {
         return mWifiData;
     }
@@ -53,5 +51,12 @@ public class AppDataUsage {
         this.mWifiData = mWifiData;
     }
 
-    private Long mWifiData;
+    @Override
+    public int compareTo(@NonNull AppDataUsage another) {
+        long app1 = getmWifiData() + getmMobileData();
+        long app2 = another.getmMobileData() + another.getmWifiData();
+        if (app1 == app2) return 0;
+        if (app1 > app2) return -1;
+        return 1;
+    }
 }
