@@ -1,40 +1,27 @@
 package com.evolving.apploader.android.sdk;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.evolving.apploader.android.sdk.api.GetConfigRequest;
 import com.evolving.apploader.android.sdk.api.NotifyAppCompleteRequest;
 import com.evolving.apploader.android.sdk.api.ProvisionalOfferRequest;
 import com.evolving.apploader.android.sdk.database.DataBaseQuery;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
-import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
 import com.evolving.apploader.android.sdk.model.AppTotalData;
+import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
 import com.evolving.apploader.android.sdk.services.RequestInitialConfigService;
 import com.evolving.apploader.android.sdk.util.AppLoaderConstants;
 import com.evolving.apploader.android.sdk.util.AppLoaderUtil;
 import com.evolving.apploader.android.sdk.util.SharedPreferenceUtil;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Static methods. Visible to the application that uses this SDK.
@@ -43,7 +30,6 @@ import java.util.Map;
 public class AppLoaderManager {
     private static RequestQueue mQueue;
     private static Context mContext;
-    private static AlarmManager mAlarmManager;
 
     public static void init(Context context, String url) {
         mContext = context;
@@ -51,24 +37,10 @@ public class AppLoaderManager {
             AppLoaderConstants.BASE_URL = url;
         }
         if (mQueue == null) {
-            //mQueue = new RequestQueue(new DiskBasedCache(context.getCacheDir(), 1024 * 1024), new BasicNetwork(new HurlStack()));
               mQueue = Volley.newRequestQueue(mContext);
         }
         if (SharedPreferenceUtil.isFirstLaunch(mContext)) {
             mContext.startService(new Intent(context, RequestInitialConfigService.class));
-            scheduleServiceCall();
-        }
-    }
-
-    private static void scheduleServiceCall() {
-        Calendar cal = Calendar.getInstance();
-
-        Intent intent = new Intent(mContext, RequestInitialConfigService.class);
-        intent.putExtra("REPEAT", true);
-        PendingIntent pIntent = PendingIntent.getService(mContext, 0, intent, 0);
-        if (mAlarmManager != null) {
-            mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), SharedPreferenceUtil.getScheduleTime(mContext), pIntent);
         }
     }
 
@@ -129,8 +101,7 @@ public class AppLoaderManager {
 
 
     public static ArrayList<ProvisionalOffer> getProvisionalOffer(Context context){
-        ArrayList<ProvisionalOffer> mProvisionalOffer = DataBaseQuery.getProvisionalOffer(context);
-        return  mProvisionalOffer;
+        return DataBaseQuery.getProvisionalOffer(context);
     }
 
 

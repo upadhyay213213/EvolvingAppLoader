@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -40,14 +39,7 @@ public class RequestInitialConfigService extends Service {
     public int onStartCommand(Intent pIntent, int flags, int startId) {
         mContext = this;
         Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
-        Log.i("bootbroadcastpoc", "RequestInitialConfigService");
-//        AppLoaderManager.init(mContext, null);
-        boolean repeat = pIntent.getBooleanExtra("REPEAT", false);
-        if (repeat) {
-            requestAppList();
-        } else {
-            requestInitialConfig();
-        }
+        requestInitialConfig();
         return super.onStartCommand(pIntent, flags, startId);
     }
 
@@ -73,8 +65,10 @@ public class RequestInitialConfigService extends Service {
                 SharedPreferenceUtil.setProjectId(mContext, response.getProjectId());
                 if (SharedPreferenceUtil.isFirstLaunch(mContext)) {
                     SharedPreferenceUtil.setIsFirstLaunch(mContext, false);
+                    requestAppList();
+                } else {
+                    stopSelf();
                 }
-                requestAppList();
             }
         }, new Response.ErrorListener() {
             @Override

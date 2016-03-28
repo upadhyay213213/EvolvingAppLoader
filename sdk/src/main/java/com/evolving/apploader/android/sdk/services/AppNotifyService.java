@@ -4,13 +4,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.evolving.apploader.android.sdk.AppLoaderManager;
-import com.evolving.apploader.android.sdk.api.GetConfigResponse;
 import com.evolving.apploader.android.sdk.api.NotifyAppCompleteResponse;
 import com.evolving.apploader.android.sdk.database.DataBaseQuery;
 import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
@@ -36,29 +34,22 @@ public class AppNotifyService extends Service {
     @Override
     public int onStartCommand(Intent pIntent, int flags, int startId) {
         mContext = this;
-        Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
-        Log.i("bootbroadcastpoc", "RequestInitialConfigService");
+        Toast.makeText(this, "AppNotify Service", Toast.LENGTH_LONG).show();
         packageName = pIntent.getStringExtra("EXTRA_PACKAGE_NAME");
         notifyServer(mContext, packageName);
         return super.onStartCommand(pIntent, flags, startId);
     }
 
     private void notifyServer(Context ctx, String packageName) {
-        //TODO @vipul pls check weather the retry policy is alryt or not let me know if you needed any changes
         ArrayList<ProvisionalOffer> mProvisionalOfferList = DataBaseQuery.getProvisionalOffer(ctx);
         if (packageName != null && mProvisionalOfferList != null) {
             for (int i = 0; i < mProvisionalOfferList.size(); i++) {
-
                 if (mProvisionalOfferList.get(i).getmPackage().equalsIgnoreCase(packageName)) {
                     DataBaseQuery.deleteProductFromDatabase(mProvisionalOfferList.get(i).getmPackage(),ctx);
                     requestNotifyComplete(ctx, packageName);
                     break;
-                } else {
-                    continue;
                 }
             }
-
-
         }
     }
 
