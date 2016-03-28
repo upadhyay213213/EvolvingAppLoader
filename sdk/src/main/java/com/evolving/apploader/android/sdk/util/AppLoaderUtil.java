@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
+import android.widget.TableRow;
 
+import com.evolving.apploader.android.sdk.gps.GPSTrackerGeneric;
+import com.evolving.apploader.android.sdk.model.AppData;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
+import com.evolving.apploader.android.sdk.model.TData;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,7 +24,7 @@ import java.util.Map;
  */
 public class AppLoaderUtil {
 
-    private static Map<Integer, AppDataUsage> appDataList = new HashMap<>();
+    private static Map<Integer, AppData> appDataList = new HashMap<>();
 
     //Getting imsi value from phone
     public static String getIMSI(Context context) {
@@ -41,10 +45,23 @@ public class AppLoaderUtil {
     public static ArrayList<AppDataUsage> getAppDataUsage(Context context) {
         prepareAppDataList(context);
         processStatsFile();
-        return new ArrayList<>(appDataList.values());
+        ArrayList<AppDataUsage> appDataUsageList = new ArrayList<>();
+        for (Map.Entry<Integer, AppData> entry : appDataList.entrySet()) {
+           AppDataUsage appDataUsage = new AppDataUsage();
+            System.out.println("after file processing"+ entry.getValue().getAppName());
+            if (entry.getValue() != null && ! entry.getValue().getTotalData().isEmpty()) {
+                appDataUsage.setmAppPackageName(entry.getValue().getPackageName());
+                appDataUsage.setAppName(entry.getValue().getAppName());
+                appDataUsage.setmMobileData(entry.getValue().getDataConsumption("mobile"));
+                appDataUsage.setmWifiData(entry.getValue().getDataConsumption("WIFI"));
+                appDataUsageList.add(appDataUsage);
+            }
+        }
+
+        return appDataUsageList;
     }
 
-    private static String processStatsFile() {
+    public static String processStatsFile() {
         StringBuilder s = new StringBuilder();
         String line;
         File netFile = new File("/proc/net/xt_qtaguid/stats");
@@ -78,18 +95,19 @@ public class AppLoaderUtil {
         return s.toString();
     }
 
-    public static void prepareAppDataList (Context context) {
+
+
+   private static  void prepareAppDataList (Context context) {
         Context mContext = context.getApplicationContext();
         PackageManager pm = mContext.getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo a: packages) {
-            AppDataUsage appDataUsage = new AppDataUsage();
-            appDataUsage.setAppName(a.name);
-            appDataUsage.setmAppPackageName(a.packageName);
-            appDataUsage.setAppId(a.uid);
+            AppData ad = new AppData();
+            ad.setAppName(pm.getApplicationLabel(a).toString());
+            ad.setAppID(a.uid);
             if (a.uid >= 10000)
-                appDataList.put(a.uid, appDataUsage);
-            System.out.println("app name = " + a.name + " package name:" + a.packageName + " ID:" + a.uid);
+                appDataList.put(a.uid, ad);
+            System.out.println("package name:"+a.packageName +" ID:"+a.uid);
         }
     }
 
@@ -124,7 +142,7 @@ public class AppLoaderUtil {
     }
 
     private static void processRecord(String[] items) {
-        AppDataUsage a = null;
+        AppData a = null;
         String key = getKey(items);
 
         System.out.println("items:  "+items[3]);
@@ -136,20 +154,51 @@ public class AppLoaderUtil {
         if (a != null) {
             System.out.println(a.getAppName());
             System.out.println(Long.parseLong( items[4]));
-            if (Long.parseLong(items[4]) == 0) {
-                System.out.println("BG data:" + a.getAppName() + "  data:" + Long.parseLong(items[5]) + Long.parseLong(items[7]));
-            } else {
-                System.out.println("FG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
+            if (Long.parseLong( items[4]) == 0) {
+                TData backGrData = new TData();
+                System.out.println("BG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
+                backGrData.setTotalData(Long.parseLong( items[5]) +  Long.parseLong( items[7]));
+                if (a.getTotalData() != null) {
+                    if (key != null && key.equals("wifi"))
+                        a.getTotalData().put(appInterfaceTypes.WIFIBG.toString(), backGrData.getTotalData());
+                    else if (key != null && key.equals("mobile")) {
+                        a.getTotalData().put(appInterfaceTypes.MOBBG.toString(), backGrData.getTotalData());
+                    }
+                }
 
-            }
-            if (key != null && key.equals("wifi"))
-                a.setmWifiData(Long.parseLong(items[5]) + Long.parseLong(items[7]));
-            else if (key != null && key.equals("mobile")) {
-                a.setmMobileData(Long.parseLong(items[5]) + Long.parseLong(items[7]));
+            } else {
+                TData fGrData = new TData();
+                fGrData.setRecBytes(items[5]);
+                fGrData.setSentBytes(items[7]);
+                System.out.println("FG data:"+a.getAppName()+"  data:"+ Long.parseLong( items[5]) +  Long.parseLong( items[7]));
+                fGrData.setTotalData(Long.parseLong( items[5]) +  Long.parseLong( items[7]));
+                if (a.getTotalData() != null) {
+                    if (key != null && key.equals("wifi"))
+                        a.getTotalData().put(appInterfaceTypes.WIFIFG.toString(), fGrData.getTotalData());
+                    else if (key != null && key.equals("mobile")) {
+                        a.getTotalData().put(appInterfaceTypes.MOBFG.toString(), fGrData.getTotalData());
+                    }
+                }
             }
             appDataList.put(Integer.parseInt(items[3]), a);
 
         }
 
+    }
+
+    public static ArrayList<Double> getLatlong(Context context){
+        ArrayList<Double> mLocation = new ArrayList<>();
+        GPSTrackerGeneric mTracker = new GPSTrackerGeneric(context);
+        mLocation.add(mTracker.getLatitude());
+        mLocation.add(mTracker.getLongitude());
+        return mLocation;
+    }
+
+    public enum appInterfaceTypes {
+        WIFIBG, WIFIFG, MOBBG, MOBFG
+    }
+
+    public enum mobileInterfaceTypes {
+        rmnet, pdp, ppp, uwbr, wimax, vsnet, ccmni, usb, lo, p2p0, tun0, rmnet0
     }
 }

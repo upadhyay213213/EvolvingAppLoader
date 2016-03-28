@@ -1,11 +1,11 @@
 package com.evolving.apploader.android.sdk.api;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.evolving.apploader.android.sdk.HttpsTrustManager;
 import com.evolving.apploader.android.sdk.util.AppLoaderConstants;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -15,47 +15,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by vipul on 3/22/2016.
+ * Created by nandan on 3/22/2016.
  */
 public class GetConfigRequest extends Request<GetConfigResponse> {
     private Response.Listener<GetConfigResponse> mListener;
+    private  String mICCID;
+    private  String mIMEI;
 
-    String mUserAgent;
-    public GetConfigRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String userAgent) {
+    public GetConfigRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String ICCID, String IMEI) {
         super(Method.PUT, url, listener);
         mListener = responseListener;
-        mUserAgent = userAgent;
-//        try {
-//            getHeaders().put("User-Agent", userAgent);
-//        } catch (AuthFailureError authFailureError) {
-//            authFailureError.printStackTrace(); //todo
-//        }
+        mICCID=ICCID;
+        mIMEI=IMEI;
     }
 
     @Override
-    public String getBodyContentType() {
-
-        return  "application/json; charset=" + this.getParamsEncoding();
+    protected Map<String,String> getParams(){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Content-Type", "application/x-www-form-urlencoded");
+        params.put("ICCID", mICCID);
+        params.put("IMEI", mIMEI);
+        return params;
     }
 
     @Override
-    protected Map<String, String> getParams() throws AuthFailureError {
-
-        HashMap<String, String> map = new HashMap<>();
-        map.put("ICCID", "1234567890123456789");
-        map.put("IMEI", "123456789012345");
-        return map;
-    }
-
-    @Override
-    public Map<String, String> getHeaders(){
+    public Map<String, String> getHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("User-agent", "Android");
+        headers.put("User-Agent", "Android");
         return headers;
     }
+
     @Override
     protected Response<GetConfigResponse> parseNetworkResponse(NetworkResponse networkResponse) {
         Gson gson = new Gson();
+        System.out.println("Volley");
         try {
             String json = new String(
                     networkResponse.data,
@@ -70,28 +63,27 @@ public class GetConfigRequest extends Request<GetConfigResponse> {
         }
     }
 
+
     @Override
     protected void deliverResponse(GetConfigResponse getConfigResponse) {
-        if (mListener != null) mListener.onResponse(getConfigResponse);
+        if (mListener != null)
+            mListener.onResponse(getConfigResponse);
+        System.out.println("Volley"+getConfigResponse.getBaseUrl());
     }
 
     public static class Builder {
+        private  String mICCID;
+        private  String mIMEI;
 
-        private String mICCID;
-        private String mIMEI;
-        private String mUserAgent;
-
-        public Builder(String iccid, String imei, String useragent) {
+        public Builder(String iccid, String imei) {
             mICCID = iccid;
             mIMEI = imei;
-            mUserAgent = useragent;
         }
 
         public GetConfigRequest build(Response.Listener listener, Response.ErrorListener errorListener) {
             StringBuilder stringBuilder = new StringBuilder(AppLoaderConstants.BASE_URL);
             stringBuilder.append(AppLoaderConstants.URL_GETCONFIG);
-//            stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
-            return new GetConfigRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);
+            return new GetConfigRequest(stringBuilder.toString(), listener, errorListener,mICCID,mIMEI);
         }
     }
 

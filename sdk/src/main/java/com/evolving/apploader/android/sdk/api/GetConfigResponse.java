@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by vipul on 3/22/2016.
- */
+import com.google.gson.annotations.SerializedName;
+
 public class GetConfigResponse implements Parcelable {
 
     static final Creator<GetConfigResponse> CREATOR
@@ -20,16 +19,25 @@ public class GetConfigResponse implements Parcelable {
             return new GetConfigResponse[size];
         }
     };
+
     private static final String APP_AD_DISPLAY_DURATION = "AppAdDisplayDuration";
     private static final String BASE_URL = "BaseURL";
     private static final String GCM_TOPIC = "GCM_TOPIC";
     private static final String PROJECT_ID = "PROJECT_ID";
     private static final String RESULT = "result";
+
+    @SerializedName(APP_AD_DISPLAY_DURATION)
     private int mDuration;
+    @SerializedName(BASE_URL)
     private String mUrl;
+    @SerializedName(GCM_TOPIC)
     private String mGCMTopic;
+    @SerializedName(PROJECT_ID)
     private String mId;
+    @SerializedName(RESULT)
     private String mResult;
+
+
 
     public GetConfigResponse(Parcel in) {
         Bundle bundle = in.readBundle(getClass().getClassLoader());

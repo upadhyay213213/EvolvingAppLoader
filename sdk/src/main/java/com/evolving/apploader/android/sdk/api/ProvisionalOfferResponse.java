@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by nupadhay on 3/23/2016.
  */
@@ -19,6 +21,7 @@ public class ProvisionalOfferResponse implements Parcelable {
             return new ProvisionalOfferResponse[size];
         }
     };
+    private static final String DESCRIPTION="DESCRIPTION";
     private static final String TYPE = "TYPE";
     private static final String PACKAGE = "PACKAGE";
     private static final String LABEL = "LABEL";
@@ -27,8 +30,27 @@ public class ProvisionalOfferResponse implements Parcelable {
     private static final String RATING = "RATING";
     private static final String DEVELOPER = "DEVELOPER";
 
+    @SerializedName(TYPE)
     private String mType;
+    @SerializedName(PACKAGE)
     private String mPackage;
+    @SerializedName(LABEL)
+    private String mLabel;
+    @SerializedName(ICON_URL)
+    private String mIconUrl;
+    @SerializedName(URL)
+    private String mURL;
+    @SerializedName(RATING)
+    private Integer mRating;
+    @SerializedName(DEVELOPER)
+    private String mDeveloper;
+    @SerializedName(DESCRIPTION)
+    private String mDescription;
+
+
+    public String getmDescription() {
+        return mDescription;
+    }
 
     public String getmDeveloper() {
         return mDeveloper;
@@ -58,12 +80,6 @@ public class ProvisionalOfferResponse implements Parcelable {
         return mURL;
     }
 
-    private String mLabel;
-    private String mIconUrl;
-    private String mURL;
-    private Integer mRating;
-    private String mDeveloper;
-
 
     public ProvisionalOfferResponse(Parcel in) {
         Bundle bundle = in.readBundle(getClass().getClassLoader());
@@ -73,6 +89,7 @@ public class ProvisionalOfferResponse implements Parcelable {
         mIconUrl = bundle.getString(ICON_URL);
         mURL = bundle.getString(URL);
         mRating = bundle.getInt(RATING);
+        mDescription=bundle.getString(DESCRIPTION);
         mDeveloper=bundle.getString(DEVELOPER);
     }
 
@@ -88,6 +105,7 @@ public class ProvisionalOfferResponse implements Parcelable {
         bundle.putString(URL, mURL);
         bundle.putString(DEVELOPER, mDeveloper);
         bundle.putInt(RATING,mRating);
+        bundle.putString(DESCRIPTION,mDescription);
         out.writeBundle(bundle);
     }
 

@@ -8,8 +8,8 @@ public class AppDataUsage implements Comparable<AppDataUsage> {
     private String mAppName;
     private String mAppPackageName;
     private int mAppId;
-    private Long mMobileData;
-    private Long mWifiData;
+    private long mMobileData;
+    private long mWifiData;
 
     public int getAppId() {
         return mAppId;
@@ -35,19 +35,19 @@ public class AppDataUsage implements Comparable<AppDataUsage> {
         this.mAppPackageName = mAppPackageName;
     }
 
-    public Long getmMobileData() {
+    public long getmMobileData() {
         return mMobileData;
     }
 
-    public void setmMobileData(Long mMobileData) {
+    public void setmMobileData(long mMobileData) {
         this.mMobileData = mMobileData;
     }
 
-    public Long getmWifiData() {
+    public long getmWifiData() {
         return mWifiData;
     }
 
-    public void setmWifiData(Long mWifiData) {
+    public void setmWifiData(long mWifiData) {
         this.mWifiData = mWifiData;
     }
 

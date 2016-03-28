@@ -16,35 +16,43 @@ import java.util.Map;
 /**
  * Created by nupadhay on 3/23/2016.
  */
-public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
-    private Response.Listener<ProvisionalOfferResponse> mListener;
+public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponseOne> {
+    private Response.Listener<ProvisionalOfferResponseOne> mListener;
+    private String mICCID;
+    private String mIMEI;
 
-    public ProvisionalOfferRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String userAgent) {
+    public ProvisionalOfferRequest(String url, Response.Listener responseListener, Response.ErrorListener listener, String ICCID, String IMEI) {
         super(Method.POST, url, listener);
         mListener = responseListener;
-//        try {
-//            getHeaders().put("User-Agent", userAgent);
-//        } catch (AuthFailureError authFailureError) {
-//            authFailureError.printStackTrace(); //todo
-//        }
+        mICCID=ICCID;
+        mIMEI=IMEI;
     }
 
     @Override
-    public Map<String, String> getHeaders(){
+    protected Map<String,String> getParams(){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("Content-Type", "application/x-www-form-urlencoded");
+        params.put("ICCID",mICCID);
+        params.put("IMEI", mIMEI);
+        return params;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
         Map<String, String> headers = new HashMap<String, String>();
-        headers.put("User-agent", "Android");
+        headers.put("User-Agent", "Android");
         return headers;
     }
 
     @Override
-    protected Response<ProvisionalOfferResponse> parseNetworkResponse(NetworkResponse networkResponse) {
+    protected Response<ProvisionalOfferResponseOne> parseNetworkResponse(NetworkResponse networkResponse) {
         Gson gson = new Gson();
         try {
             String json = new String(
                     networkResponse.data,
                     HttpHeaderParser.parseCharset(networkResponse.headers));
             return Response.success(
-                    gson.fromJson(json, ProvisionalOfferResponse.class),
+                    gson.fromJson(json, ProvisionalOfferResponseOne.class),
                     HttpHeaderParser.parseCacheHeaders(networkResponse));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
@@ -54,27 +62,22 @@ public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponse> {
     }
 
     @Override
-    protected void deliverResponse(ProvisionalOfferResponse getConfigResponse) {
+    protected void deliverResponse(ProvisionalOfferResponseOne getConfigResponse) {
         if (mListener != null) mListener.onResponse(getConfigResponse);
     }
 
     public static class Builder {
-
         private String mICCID;
         private String mIMEI;
-        private String mUserAgent;
-
-        public Builder(String iccid, String imei, String useragent) {
+        public Builder(String iccid, String imei) {
             mICCID = iccid;
             mIMEI = imei;
-            mUserAgent = useragent;
         }
 
         public ProvisionalOfferRequest build(String baseUrl, Response.Listener listener, Response.ErrorListener errorListener) {
-            StringBuilder stringBuilder = new StringBuilder(baseUrl);
+            StringBuilder stringBuilder = new StringBuilder(AppLoaderConstants.BASE_URL);
             stringBuilder.append(AppLoaderConstants.URL_GET_PROVISIONAL_OFFER);
-            stringBuilder.append("?ICCID=").append(mICCID).append("&IMEI=").append(mIMEI);
-            return new ProvisionalOfferRequest(stringBuilder.toString(), listener, errorListener, mUserAgent);
+            return new ProvisionalOfferRequest(stringBuilder.toString(), listener, errorListener,mICCID,mIMEI);
         }
     }
 }

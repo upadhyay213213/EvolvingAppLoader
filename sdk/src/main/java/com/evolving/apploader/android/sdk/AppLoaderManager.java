@@ -5,13 +5,19 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.evolving.apploader.android.sdk.api.GetConfigRequest;
 import com.evolving.apploader.android.sdk.api.NotifyAppCompleteRequest;
 import com.evolving.apploader.android.sdk.api.ProvisionalOfferRequest;
@@ -27,6 +33,8 @@ import com.evolving.apploader.android.sdk.util.SharedPreferenceUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Static methods. Visible to the application that uses this SDK.
@@ -43,7 +51,8 @@ public class AppLoaderManager {
             AppLoaderConstants.BASE_URL = url;
         }
         if (mQueue == null) {
-            mQueue = new RequestQueue(new DiskBasedCache(context.getCacheDir(), 1024 * 1024), new BasicNetwork(new HurlStack()));
+            //mQueue = new RequestQueue(new DiskBasedCache(context.getCacheDir(), 1024 * 1024), new BasicNetwork(new HurlStack()));
+              mQueue = Volley.newRequestQueue(mContext);
         }
         if (SharedPreferenceUtil.isFirstLaunch(mContext)) {
             mContext.startService(new Intent(context, RequestInitialConfigService.class));
@@ -64,7 +73,8 @@ public class AppLoaderManager {
     }
 
     public static Request requestConfig(String iccid, String imei, Response.Listener listener, Response.ErrorListener errorListener) {
-        GetConfigRequest request = new GetConfigRequest.Builder(iccid, imei, System.getProperty("http.agent")).build(listener, errorListener);
+        HttpsTrustManager.allowAllSSL();
+        GetConfigRequest request = new GetConfigRequest.Builder(iccid, imei).build(listener, errorListener);
         if (mQueue == null || TextUtils.isEmpty(AppLoaderConstants.BASE_URL)) {
             //throw exception
             throw new IllegalStateException("Manager not initialized");
@@ -74,8 +84,8 @@ public class AppLoaderManager {
     }
 
     public static Request provisionalOfferRequest(String iccid, String imei, Response.Listener listener, Response.ErrorListener errorListener) {
-        ProvisionalOfferRequest request = new ProvisionalOfferRequest.Builder(iccid, imei,
-                System.getProperty("http.agent")).build(SharedPreferenceUtil.getAppBaseUrl(mContext), listener, errorListener);
+        HttpsTrustManager.allowAllSSL();
+        ProvisionalOfferRequest request = new ProvisionalOfferRequest.Builder(iccid, imei).build(SharedPreferenceUtil.getAppBaseUrl(mContext), listener, errorListener);
         if (mQueue == null || TextUtils.isEmpty(AppLoaderConstants.BASE_URL)) {
             //throw exception
             throw new IllegalStateException("Manager not initialized");
@@ -85,6 +95,7 @@ public class AppLoaderManager {
     }
 
     public static Request notifyAppCompleteRequest(String iccid, String imei,String packageID, Response.Listener listener, Response.ErrorListener errorListener) {
+        HttpsTrustManager.allowAllSSL();
         NotifyAppCompleteRequest request = new NotifyAppCompleteRequest.Builder(iccid, imei, packageID, System.getProperty("http.agent")).build(listener, errorListener);
         if (mQueue == null || TextUtils.isEmpty(AppLoaderConstants.BASE_URL)) {
             //throw exception
@@ -110,6 +121,9 @@ public class AppLoaderManager {
         appTotalData.setUsageAppListSorted(sorted.subList(0, 10));
         appTotalData.setTotalCellularBytes(cellBytes);
         appTotalData.setTotalWifiBytes(wifiBytes);
+        appTotalData.setLatitude(AppLoaderUtil.getLatlong(mContext).get(0));
+        appTotalData.setLongitude(AppLoaderUtil.getLatlong(mContext).get(1));
+        AppLoaderUtil.getLatlong(mContext).clear();
         return appTotalData;
     }
 
@@ -118,4 +132,6 @@ public class AppLoaderManager {
         ArrayList<ProvisionalOffer> mProvisionalOffer = DataBaseQuery.getProvisionalOffer(context);
         return  mProvisionalOffer;
     }
+
+
 }

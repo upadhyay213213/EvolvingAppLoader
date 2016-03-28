@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 
 /**
@@ -11,27 +13,26 @@ import java.util.ArrayList;
  */
 public class ProvisionalOfferResponseOne implements Parcelable {
 
-    static final Parcelable.Creator<NotifyAppCompleteResponse> CREATOR
-            = new Parcelable.Creator<NotifyAppCompleteResponse>() {
-        public NotifyAppCompleteResponse createFromParcel(Parcel in) {
-            return new NotifyAppCompleteResponse(in);
+    static final Parcelable.Creator<ProvisionalOfferResponseOne> CREATOR
+            = new Parcelable.Creator<ProvisionalOfferResponseOne>() {
+        public ProvisionalOfferResponseOne createFromParcel(Parcel in) {
+            return new ProvisionalOfferResponseOne(in);
         }
 
-        public NotifyAppCompleteResponse[] newArray(int size) {
-            return new NotifyAppCompleteResponse[size];
+        public ProvisionalOfferResponseOne[] newArray(int size) {
+            return new ProvisionalOfferResponseOne[size];
         }
     };
     private static final String RESULT= "result";
     private static final String PROVISIONAL_OFFER= "AppList";
+    @SerializedName(RESULT)
     private String mResult ;
-
-
+    @SerializedName(PROVISIONAL_OFFER)
+    private ArrayList<ProvisionalOfferResponse> mProvisionalOffer;
     public ArrayList<ProvisionalOfferResponse> getmProvisionalOffer() {
+
         return mProvisionalOffer;
     }
-
-    private ArrayList<ProvisionalOfferResponse> mProvisionalOffer;
-
 
     public ProvisionalOfferResponseOne(Parcel in) {
         Bundle bundle = in.readBundle(getClass().getClassLoader());
