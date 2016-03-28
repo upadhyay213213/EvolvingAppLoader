@@ -68,8 +68,6 @@ public class AppNotifyService extends Service {
         AppLoaderManager.notifyAppCompleteRequest(iccid, imei, packageName, new Response.Listener() {
             @Override
             public void onResponse(Object o) {
-                if (!(o instanceof GetConfigResponse))
-
                 if (!(o instanceof NotifyAppCompleteResponse)) {
                     if (sRetries > 0) {
                         sRetries--;

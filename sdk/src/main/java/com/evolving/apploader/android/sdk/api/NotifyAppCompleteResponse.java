@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by nupadhay on 3/23/2016.
  */
@@ -21,6 +23,7 @@ public class NotifyAppCompleteResponse implements Parcelable {
     };
     private static final String RESULT= "result";
 
+    @SerializedName(RESULT)
     private String mResult ;
 
 
