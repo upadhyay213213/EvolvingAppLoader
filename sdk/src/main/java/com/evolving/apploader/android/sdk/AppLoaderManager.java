@@ -110,6 +110,9 @@ public class AppLoaderManager {
         appTotalData.setUsageAppListSorted(sorted.subList(0, 10));
         appTotalData.setTotalCellularBytes(cellBytes);
         appTotalData.setTotalWifiBytes(wifiBytes);
+        appTotalData.setLatitude(AppLoaderUtil.getLatlong(mContext).get(0));
+        appTotalData.setLongitude(AppLoaderUtil.getLatlong(mContext).get(1));
+        AppLoaderUtil.getLatlong(mContext).clear();
         return appTotalData;
     }
 

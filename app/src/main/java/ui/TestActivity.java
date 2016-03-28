@@ -18,9 +18,13 @@ public class TestActivity extends Activity implements Response.Listener ,Respons
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        AppLoaderManager.init(this);
-        AppLoaderManager.provisionalOfferRequest("1234567891234561234", "123456789112345", this, this);
+//        StringBuffer m = new StringBuffer();
+//          for(int i =0; i< AppLoaderManager.getTotalAppData().getUsageAppListSorted().size();i++){
+//              m.append(AppLoaderManager.getTotalAppData().getUsageAppListSorted().get(i).getAppName());
+//              m.append(AppLoaderManager.getTotalAppData().getUsageAppListSorted().get(i).getmMobileData());
+//              m.append(AppLoaderManager.getTotalAppData().getUsageAppListSorted().get(i).getmWifiData());
+//          }
+        System.out.println("AppdataUsage" + AppLoaderManager.getTotalAppData().getLatitude());
     }
     @Override
     public void onErrorResponse(VolleyError volleyError) {

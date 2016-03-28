@@ -1,3 +1,5 @@
+package ui.application;
+
 import android.app.Application;
 
 import com.evolving.apploader.android.sdk.AppLoaderManager;
