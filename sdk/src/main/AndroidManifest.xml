@@ -53,6 +53,7 @@
         </receiver>
 
         <service android:name=".services.RequestInitialConfigService" />
+        <service android:name=".services.AppNotifyService" />
     </application>
 
 </manifest>

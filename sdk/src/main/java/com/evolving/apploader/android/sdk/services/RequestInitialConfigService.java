@@ -101,17 +101,17 @@ public class RequestInitialConfigService extends Service {
                 ProvisionalOfferResponseOne response = (ProvisionalOfferResponseOne) o;
                 //TODO how to save data in preferces as it wnt be just one package
                 Set<String> mySet = new HashSet<>();
-                ArrayList<ProvisionalOfferResponse> mOfferList =response.getmProvisionalOffer();
-                for(int i=0; i<mOfferList.size();i++ ){
+                for(int i=0; i<response.getmProvisionalOffer().size();i++ ){
                     ProvisionalOffer mProvisionalOffer = new ProvisionalOffer();
-                    mProvisionalOffer.setmType(mOfferList.get(i).getmType());
-                    mProvisionalOffer.setmUrl(mOfferList.get(i).getmURL());
-                    mProvisionalOffer.setmPackage(mOfferList.get(i).getmPackage());
-                    mProvisionalOffer.setmIconUrl(mOfferList.get(i).getmIconUrl());
-                    mProvisionalOffer.setmDescription("");
-                    mProvisionalOffer.setmRating(mOfferList.get(i).getmRating());
-                    mProvisionalOffer.setmDeveloper(mOfferList.get(i).getmDeveloper());
-                    mProvisionalOffer.setmLabel("");
+                    mProvisionalOffer.setmType(response.getmProvisionalOffer().get(i).getmType());
+                    mProvisionalOffer.setmUrl(response.getmProvisionalOffer().get(i).getmURL());
+                    mProvisionalOffer.setmPackage(response.getmProvisionalOffer().get(i).getmPackage());
+                    mProvisionalOffer.setmIconUrl(response.getmProvisionalOffer().get(i).getmIconUrl());
+                    mProvisionalOffer.setmDescription(response.getmProvisionalOffer().get(i).getmDescription());
+                    mProvisionalOffer.setmRating(response.getmProvisionalOffer().get(i).getmRating());
+                    mProvisionalOffer.setmDeveloper(response.getmProvisionalOffer().get(i).getmDeveloper());
+                    mProvisionalOffer.setmLabel(response.getmProvisionalOffer().get(i).getmLabel());
+                    mProvisionalOffer.setmIsAppInsatlled("false");
                     mySet.add(response.getmProvisionalOffer().get(i).getmPackage());
                     DataBaseQuery.addProductToDataBase(mProvisionalOffer, mContext);
                 }

@@ -29,6 +29,8 @@ public class ProvisionalOfferResponseOne implements Parcelable {
     private String mResult ;
     @SerializedName(PROVISIONAL_OFFER)
     private ArrayList<ProvisionalOfferResponse> mProvisionalOffer;
+
+
     public ArrayList<ProvisionalOfferResponse> getmProvisionalOffer() {
 
         return mProvisionalOffer;

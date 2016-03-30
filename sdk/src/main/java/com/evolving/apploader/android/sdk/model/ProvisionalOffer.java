@@ -12,6 +12,26 @@ public class ProvisionalOffer {
     private String mUrl;
     private Integer mRating;
     private String mDeveloper;
+    private String mIndex;
+
+
+    public String getmIndex() {
+        return mIndex;
+    }
+
+    public void setmIndex(String mIndex) {
+        this.mIndex = mIndex;
+    }
+
+    public String getmIsAppInsatlled() {
+        return mIsAppInsatlled;
+    }
+
+    public void setmIsAppInsatlled(String mIsAppInsatlled) {
+        this.mIsAppInsatlled = mIsAppInsatlled;
+    }
+
+    private String mIsAppInsatlled;
 
     public String getmDescription() {
         return mDescription;

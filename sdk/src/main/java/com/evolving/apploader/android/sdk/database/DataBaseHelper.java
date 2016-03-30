@@ -18,16 +18,29 @@ import java.io.File;
     public static final String DB_NAME = "evolsdkdatabase.sqlite";
     private static final int DB_VERSION = 1;
 
-    private static String PRODUCT_TABLE = "ProvisionalOffer";
+    public static String PRODUCT_TABLE = "ProvisionalOffer";
+    public static String PRODUCT_TABLE_TEMP = "ProvisionalOffer_TEMP";
     private static String DB_PATH = null;
     private static DataBaseHelper sDbHelper;
     private static SQLiteDatabase sDbInstance = null;
+    public static final String PRODUCT_TABLE_TEMP_COUNT ="productInfoTempCount" ;
 
 
 
-    public static final String SQL_CREATE_PRODUCT_INFO_TABLE = "CREATE TABLE IF NOT EXISTS "
+    private static final String SQL_CREATE_PRODUCT_INFO_TABLE = "CREATE TABLE IF NOT EXISTS "
             + PRODUCT_TABLE
-            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR)";
+            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR,App_Insatlled VARCHAR DEFAULT false,Index VARCHAR)";
+
+
+    private static final String SQL_CREATE_PRODUCT_INFO_TEMP_TABLE = "CREATE TABLE IF NOT EXISTS "
+            + PRODUCT_TABLE_TEMP
+            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR,App_Insatlled VARCHAR DEFAULT false,Index VARCHAR)";
+
+
+
+    private static final String SQL_CREATE_PRODUCT_INFO_TEMP_TABLE_COUNT = "CREATE TABLE IF NOT EXISTS "
+            + PRODUCT_TABLE_TEMP_COUNT
+            + "(ProductCount INTEGER)";
 
 
     public static DataBaseHelper init(Context context) {
@@ -52,6 +65,8 @@ import java.io.File;
         if (!dbExists) {
             sDbInstance = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
             sDbInstance.execSQL(SQL_CREATE_PRODUCT_INFO_TABLE);
+            sDbInstance.execSQL(SQL_CREATE_PRODUCT_INFO_TEMP_TABLE);
+            sDbInstance.execSQL(SQL_CREATE_PRODUCT_INFO_TEMP_TABLE_COUNT);
             sDbInstance.close();
         }
     }
@@ -112,5 +127,6 @@ import java.io.File;
         // TODO Auto-generated method stub
 
     }
+
 
 }

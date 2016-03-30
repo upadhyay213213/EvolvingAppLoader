@@ -21,6 +21,8 @@ public class ProvisionalOfferResponse implements Parcelable {
             return new ProvisionalOfferResponse[size];
         }
     };
+
+
     private static final String DESCRIPTION="DESCRIPTION";
     private static final String TYPE = "TYPE";
     private static final String PACKAGE = "PACKAGE";
@@ -29,6 +31,7 @@ public class ProvisionalOfferResponse implements Parcelable {
     private static final String URL = "URL";
     private static final String RATING = "RATING";
     private static final String DEVELOPER = "DEVELOPER";
+    private static final String INDEX="INDEX";
 
     @SerializedName(TYPE)
     private String mType;
@@ -46,8 +49,13 @@ public class ProvisionalOfferResponse implements Parcelable {
     private String mDeveloper;
     @SerializedName(DESCRIPTION)
     private String mDescription;
+    @SerializedName(INDEX)
+    private int mIndex;
 
 
+    public int getmIndex() {
+        return mIndex;
+    }
     public String getmDescription() {
         return mDescription;
     }
@@ -91,6 +99,7 @@ public class ProvisionalOfferResponse implements Parcelable {
         mRating = bundle.getInt(RATING);
         mDescription=bundle.getString(DESCRIPTION);
         mDeveloper=bundle.getString(DEVELOPER);
+        mIndex= bundle.getInt(INDEX);
     }
 
 
@@ -104,8 +113,9 @@ public class ProvisionalOfferResponse implements Parcelable {
         bundle.putString(ICON_URL, mIconUrl);
         bundle.putString(URL, mURL);
         bundle.putString(DEVELOPER, mDeveloper);
-        bundle.putInt(RATING,mRating);
-        bundle.putString(DESCRIPTION,mDescription);
+        bundle.putInt(RATING, mRating);
+        bundle.putString(DESCRIPTION, mDescription);
+        bundle.putInt(INDEX,mIndex);
         out.writeBundle(bundle);
     }
 

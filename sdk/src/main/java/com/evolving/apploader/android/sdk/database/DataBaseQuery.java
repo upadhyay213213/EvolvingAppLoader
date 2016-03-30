@@ -14,18 +14,16 @@ import java.util.ArrayList;
  */
 public class DataBaseQuery {
 
-    public static void addProductToDataBase(ProvisionalOffer productInfo,Context ctx) {
-           DataBaseHelper.init(ctx);
-          String query ="INSERT INTO ProvisionalOffer (Type,Package,Label,Description,IconUrl,Url,Rating,Developer)VALUES "
-                            + "(?,?,?,?,?,?,?,?)";
-            SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
-            SQLiteStatement statement = db.compileStatement(query);
-            statement = bindValuesToStatement(productInfo, statement);
-            statement.execute();
-            statement.close();
+    public static void addProductToDataBase(ProvisionalOffer productInfo, Context ctx) {
+        DataBaseHelper.init(ctx);
+        String query = "INSERT INTO ProvisionalOffer (Type,Package,Label,Description,IconUrl,Url,Rating,Developer,App_Installed,Index)VALUES "
+                + "(?,?,?,?,?,?,?,?,?,?)";
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        SQLiteStatement statement = db.compileStatement(query);
+        statement = bindValuesToStatement(productInfo, statement);
+        statement.execute();
+        statement.close();
     }
-
-
 
 
     private static SQLiteStatement bindValuesToStatement(ProvisionalOffer productInfo,
@@ -39,7 +37,8 @@ public class DataBaseQuery {
             statement.bindString(6, productInfo.getmUrl());
             statement.bindDouble(7, productInfo.getmRating());
             statement.bindString(8, productInfo.getmDeveloper());
-
+            statement.bindString(9,productInfo.getmIsAppInsatlled());
+            statement.bindString(10,productInfo.getmIndex());
         } catch (Exception e) {
             //todo
         }
@@ -47,10 +46,11 @@ public class DataBaseQuery {
     }
 
 
-    public static ArrayList<ProvisionalOffer> getProvisionalOffer(Context ctx) {
-        DataBaseHelper.init(ctx);
+    public static ArrayList<ProvisionalOffer> getProviosnalOffer(String appInstallStatus, Context context) {
+        DataBaseHelper.init(context);
         ArrayList<ProvisionalOffer> productList = new ArrayList<>();
-        String query = "SELECT * FROM ProvisionalOffer";
+        String query = "SELECT * FROM " + DataBaseHelper.PRODUCT_TABLE + " WHERE App_Installed = "
+                + appInstallStatus+" ORDER BY Index ASC";
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
         while (cur.moveToNext()) {
@@ -70,6 +70,28 @@ public class DataBaseQuery {
     }
 
 
+    public static ArrayList<ProvisionalOffer> getProvisionalOffer(Context ctx) {
+        DataBaseHelper.init(ctx);
+        ArrayList<ProvisionalOffer> productList = new ArrayList<>();
+        String query = "SELECT * FROM ProvisionalOffer ORDER BY Index ASC";
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
+        while (cur.moveToNext()) {
+            ProvisionalOffer product = new ProvisionalOffer();
+            product.setmLabel(cur.getString(cur.getColumnIndexOrThrow("Label")));
+            product.setmDescription(cur.getString(cur.getColumnIndexOrThrow("Description")));
+            product.setmDeveloper(cur.getString(cur.getColumnIndexOrThrow("Developer")));
+            product.setmIconUrl(cur.getString(cur.getColumnIndexOrThrow("IconUrl")));
+            product.setmRating(cur.getInt(cur.getColumnIndexOrThrow("Rating")));
+            product.setmPackage(cur.getString(cur.getColumnIndexOrThrow("Package")));
+            product.setmUrl(cur.getString(cur.getColumnIndexOrThrow("Url")));
+            product.setmType(cur.getString(cur.getColumnIndexOrThrow("Type")));
+            productList.add(product);
+        }
+        cur.close();
+        return productList;
+    }
+
 
     public static void removeAll(Context ctx) {
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
@@ -78,9 +100,108 @@ public class DataBaseQuery {
     }
 
 
-    public static void deleteProductFromDatabase(String packageName,Context ctx) {
+    public static void deleteProductFromDatabase(String packageName, Context ctx) {
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
-        String query = "Delete from ProvisionalOffer WHERE Package='" + packageName+ "'";
+        String query = "Delete from ProvisionalOffer WHERE Package='" + packageName + "'";
+        db.execSQL(query);
+    }
+
+
+    //Add the product response from GCM to temporary table
+    public static void addProductToTempDataBase(ProvisionalOffer productInfo, Context ctx) {
+        DataBaseHelper.init(ctx);
+        String query = "INSERT INTO " + DataBaseHelper.PRODUCT_TABLE_TEMP+"(Type,Package,Label,Description,IconUrl,Url,Rating,Developer)VALUES "
+                + "(?,?,?,?,?,?,?,?)";
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        SQLiteStatement statement = db.compileStatement(query);
+        statement = bindValuesToStatement(productInfo, statement);
+        statement.execute();
+        statement.close();
+
+
+        if (isGCMCountAndProductInfoTempCountSame()) {
+            reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE();
+
+        }
+
+    }
+
+    //Add product count got from GCM
+    public static void addProductTableCount(int count, Context ctx) {
+        DataBaseHelper.init(ctx);
+
+        String query = "INSERT INTO "+ DataBaseHelper.PRODUCT_TABLE_TEMP_COUNT+" (ProductCount)VALUES "
+                + "(?)";
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        SQLiteStatement statement = db.compileStatement(query);
+        statement.bindDouble(1, count);
+        statement.execute();
+        statement.close();
+
+    }
+
+    private static int getProductCountFromGCM() {
+        int productCount = 0;
+        String query = "SELECT ProductCount FROM "+DataBaseHelper.PRODUCT_TABLE_TEMP_COUNT;
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
+        while (cur.moveToNext()) {
+            productCount = cur.getInt(cur.getColumnIndexOrThrow("ProductCount"));
+        }
+        cur.close();
+        return productCount;
+
+    }
+
+    private static int getCountOfTempProductInfo() {
+        int productCount = 0;
+        String query = "SELECT  COUNT (*) as count FROM "+DataBaseHelper.PRODUCT_TABLE_TEMP;
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
+        while (cur.moveToNext()) {
+            productCount = cur.getInt(cur.getColumnIndexOrThrow("count"));
+        }
+        cur.close();
+        return productCount;
+    }
+
+    /**
+     * check if product count from gcm and inserted product count is same
+     *
+     * @return
+     */
+    private static boolean isGCMCountAndProductInfoTempCountSame() {
+        if (getCountOfTempProductInfo() == getProductCountFromGCM()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *reNameProductInfoTempToProductInfo
+     */
+
+    private static void reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE() {
+        deletProductInfoTable();
+        removeGCMCount();
+        ReNameProvisionalOffer_TEMPtoProvisionalOffer();
+
+    }
+    private static void deletProductInfoTable(){
+        String query = "DROP TABLE IF EXISTS "+DataBaseHelper.PRODUCT_TABLE;
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        db.execSQL(query);
+    }
+
+    public static void removeGCMCount() {
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        String query = "Delete from "+DataBaseHelper.PRODUCT_TABLE_TEMP_COUNT;
+        db.execSQL(query);
+    }
+    private static void ReNameProvisionalOffer_TEMPtoProvisionalOffer(){
+        String query = "ALTER TABLE "+DataBaseHelper.PRODUCT_TABLE_TEMP+ " RENAME TO "+DataBaseHelper.PRODUCT_TABLE;
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         db.execSQL(query);
     }
 }
