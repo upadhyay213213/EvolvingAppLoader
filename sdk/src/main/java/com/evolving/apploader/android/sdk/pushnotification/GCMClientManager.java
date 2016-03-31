@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import java.io.IOException;
@@ -26,12 +27,14 @@ public class GCMClientManager {
     private String projectNumber;
     private Activity activity;
     private GCMRegisterListner gcmRegisterListner;
-
-    public GCMClientManager(Context context, String projectNumber) {
-        this.activity = activity;
+    private   String TOPICS = "IndoSat-Topic01";
+    public GCMClientManager(Context context, String projectNumber,String gcmTopic) {
+        this.activity = (Activity) context;
         this.projectNumber = projectNumber;
+        this.TOPICS = gcmTopic;
         this.gcm = GoogleCloudMessaging.getInstance(activity);
         this.gcmRegisterListner=(GCMRegisterListner)context;
+       // registerIfNeeded();
     }
     /**
      * @return Application's version code from the {@code PackageManager}.
@@ -76,6 +79,9 @@ public class GCMClientManager {
                     }
                     InstanceID instanceID = InstanceID.getInstance(getContext());
                     regid = instanceID.getToken(projectNumber, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                    GcmPubSub pubSub = GcmPubSub.getInstance(activity);
+                    pubSub.subscribe(regid, "/topics/" + TOPICS, null);
+                    Log.d(TAG, "++++++++++++++++++++ Registered with topic : "+TOPICS);
                     Log.i(TAG, regid);
                     // Persist the regID - no need to register again.
                     storeRegistrationId(getContext(), regid);
@@ -91,6 +97,11 @@ public class GCMClientManager {
             protected void onPostExecute(String regId) {
                 if (regId != null) {
                     handler.onSuccess(regId, true);
+                    try {
+                        subscribeTopics(regId);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }.execute(null, null, null);
@@ -167,5 +178,7 @@ public class GCMClientManager {
     private Activity getActivity() {
         return activity;
     }
+    private void subscribeTopics(String token) throws IOException {
 
+    }
 }

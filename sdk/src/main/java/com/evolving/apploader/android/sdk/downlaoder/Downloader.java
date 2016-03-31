@@ -28,8 +28,6 @@ public class Downloader {
         mBuilder.setContentTitle("Downloading file")
                 .setContentText("Downloading... 0%");
         mNotifyManager.notify(11, mBuilder.build());
-
-
     }
 
     public void startDownloading() {

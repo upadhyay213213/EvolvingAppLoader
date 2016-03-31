@@ -45,7 +45,7 @@ public class AppNotifyService extends Service {
         if (packageName != null && mProvisionalOfferList != null) {
             for (int i = 0; i < mProvisionalOfferList.size(); i++) {
                 if (mProvisionalOfferList.get(i).getmPackage().equalsIgnoreCase(packageName)) {
-                    DataBaseQuery.deleteProductFromDatabase(mProvisionalOfferList.get(i).getmPackage(),ctx);
+                    DataBaseQuery.updateProviosnalOffer(mProvisionalOfferList.get(i).getmPackage(),"true",ctx);
                     requestNotifyComplete(ctx, packageName);
                     break;
                 }

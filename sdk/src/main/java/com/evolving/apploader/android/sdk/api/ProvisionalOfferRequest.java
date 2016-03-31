@@ -32,7 +32,7 @@ public class ProvisionalOfferRequest extends Request<ProvisionalOfferResponseOne
     protected Map<String,String> getParams(){
         Map<String, String> params = new HashMap<String, String>();
         params.put("Content-Type", "application/x-www-form-urlencoded");
-        params.put("ICCID",mICCID);
+        params.put("ICCID","12345678901234567890");
         params.put("IMEI", mIMEI);
         return params;
     }

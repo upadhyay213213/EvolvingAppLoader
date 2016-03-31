@@ -38,7 +38,7 @@ public class RequestInitialConfigService extends Service {
     @Override
     public int onStartCommand(Intent pIntent, int flags, int startId) {
         mContext = this;
-        Toast.makeText(this, "NotifyingDailyService", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "FirstTimeAppInsatlled and Boot Time", Toast.LENGTH_LONG).show();
         requestInitialConfig();
         return super.onStartCommand(pIntent, flags, startId);
     }
@@ -63,6 +63,9 @@ public class RequestInitialConfigService extends Service {
                 SharedPreferenceUtil.setAppBaseUrl(mContext, response.getBaseUrl());
                 SharedPreferenceUtil.setGCMTopic(mContext, response.getGCMTopic());
                 SharedPreferenceUtil.setProjectId(mContext, response.getProjectId());
+
+                //GCM topic please use error handler for the same in future use
+                AppLoaderManager.registerGCM(mContext,response.getProjectId(),response.getGCMTopic());
                 if (SharedPreferenceUtil.isFirstLaunch(mContext)) {
                     SharedPreferenceUtil.setIsFirstLaunch(mContext, false);
                     requestAppList();
@@ -99,8 +102,6 @@ public class RequestInitialConfigService extends Service {
                     return; // throw error?
                 }
                 ProvisionalOfferResponseOne response = (ProvisionalOfferResponseOne) o;
-                //TODO how to save data in preferces as it wnt be just one package
-                Set<String> mySet = new HashSet<>();
                 for(int i=0; i<response.getmProvisionalOffer().size();i++ ){
                     ProvisionalOffer mProvisionalOffer = new ProvisionalOffer();
                     mProvisionalOffer.setmType(response.getmProvisionalOffer().get(i).getmType());
@@ -112,10 +113,9 @@ public class RequestInitialConfigService extends Service {
                     mProvisionalOffer.setmDeveloper(response.getmProvisionalOffer().get(i).getmDeveloper());
                     mProvisionalOffer.setmLabel(response.getmProvisionalOffer().get(i).getmLabel());
                     mProvisionalOffer.setmIsAppInsatlled("false");
-                    mySet.add(response.getmProvisionalOffer().get(i).getmPackage());
+                    mProvisionalOffer.setmIndex(response.getmProvisionalOffer().get(i).getmIndex());
                     DataBaseQuery.addProductToDataBase(mProvisionalOffer, mContext);
                 }
-                SharedPreferenceUtil.setAppPackageName(mContext, mySet);
                 stopSelf();
             }
         }, new Response.ErrorListener() {

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
+import com.evolving.apploader.android.sdk.model.ProvisionOfferModel;
 import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class DataBaseQuery {
 
     public static void addProductToDataBase(ProvisionalOffer productInfo, Context ctx) {
         DataBaseHelper.init(ctx);
-        String query = "INSERT INTO ProvisionalOffer (Type,Package,Label,Description,IconUrl,Url,Rating,Developer,App_Installed,Index)VALUES "
+        String query = "INSERT INTO ProvisionalOffer (Type,Package,Label,Description,IconUrl,Url,Rating,Developer,App_Insatlled,Index_app)VALUES "
                 + "(?,?,?,?,?,?,?,?,?,?)";
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         SQLiteStatement statement = db.compileStatement(query);
@@ -45,12 +46,29 @@ public class DataBaseQuery {
         return statement;
     }
 
-
-    public static ArrayList<ProvisionalOffer> getProviosnalOffer(String appInstallStatus, Context context) {
+    private static SQLiteStatement bindValuesToStatementTemp(ProvisionOfferModel productInfo,
+                                                         SQLiteStatement statement) {
+        try {
+            statement.bindString(1, productInfo.getmType());
+            statement.bindString(2, productInfo.getmPackage());
+            statement.bindString(3, productInfo.getmLabel());
+            statement.bindString(4, productInfo.getmDescription());
+            statement.bindString(5, productInfo.getmIconUrl());
+            statement.bindString(6, productInfo.getmUrl());
+            statement.bindDouble(7, productInfo.getmRating());
+            statement.bindString(8, productInfo.getmDeveloper());
+            statement.bindString(9,productInfo.getmIsAppInsatlled());
+            statement.bindString(10,productInfo.getmIndex());
+        } catch (Exception e) {
+            //todo
+        }
+        return statement;
+    }
+    public static ArrayList<ProvisionalOffer> getProvisionalOnlyUnInstalledApps(String appInstallStatus, Context context) {
         DataBaseHelper.init(context);
         ArrayList<ProvisionalOffer> productList = new ArrayList<>();
         String query = "SELECT * FROM " + DataBaseHelper.PRODUCT_TABLE + " WHERE App_Installed = "
-                + appInstallStatus+" ORDER BY Index ASC";
+                + appInstallStatus+" ORDER BY Index_app ASC";
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
         while (cur.moveToNext()) {
@@ -73,7 +91,7 @@ public class DataBaseQuery {
     public static ArrayList<ProvisionalOffer> getProvisionalOffer(Context ctx) {
         DataBaseHelper.init(ctx);
         ArrayList<ProvisionalOffer> productList = new ArrayList<>();
-        String query = "SELECT * FROM ProvisionalOffer ORDER BY Index ASC";
+        String query = "SELECT * FROM " + DataBaseHelper.PRODUCT_TABLE +" ORDER BY Index_app ASC" ;//+ " ORDER BY Index"
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         Cursor cur = DataBaseHelper.executeSelectQuery(db, query, null);
         while (cur.moveToNext()) {
@@ -108,19 +126,19 @@ public class DataBaseQuery {
 
 
     //Add the product response from GCM to temporary table
-    public static void addProductToTempDataBase(ProvisionalOffer productInfo, Context ctx) {
+    public static void addProductToTempDataBase(ProvisionOfferModel productInfo, Context ctx) {
         DataBaseHelper.init(ctx);
         String query = "INSERT INTO " + DataBaseHelper.PRODUCT_TABLE_TEMP+"(Type,Package,Label,Description,IconUrl,Url,Rating,Developer)VALUES "
                 + "(?,?,?,?,?,?,?,?)";
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         SQLiteStatement statement = db.compileStatement(query);
-        statement = bindValuesToStatement(productInfo, statement);
+        statement = bindValuesToStatementTemp(productInfo, statement);
         statement.execute();
         statement.close();
 
 
         if (isGCMCountAndProductInfoTempCountSame()) {
-            reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE();
+            reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE(ctx);
 
         }
 
@@ -182,10 +200,10 @@ public class DataBaseQuery {
      *reNameProductInfoTempToProductInfo
      */
 
-    private static void reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE() {
+    private static void reNameTablePRODUCT_INFO_TEMPtoPRODUCT_INFO_TABLE(Context context) {
         deletProductInfoTable();
         removeGCMCount();
-        ReNameProvisionalOffer_TEMPtoProvisionalOffer();
+        ReNameProvisionalOffer_TEMPtoProvisionalOffer(context);
 
     }
     private static void deletProductInfoTable(){
@@ -199,9 +217,22 @@ public class DataBaseQuery {
         String query = "Delete from "+DataBaseHelper.PRODUCT_TABLE_TEMP_COUNT;
         db.execSQL(query);
     }
-    private static void ReNameProvisionalOffer_TEMPtoProvisionalOffer(){
+    private static void ReNameProvisionalOffer_TEMPtoProvisionalOffer(Context context){
         String query = "ALTER TABLE "+DataBaseHelper.PRODUCT_TABLE_TEMP+ " RENAME TO "+DataBaseHelper.PRODUCT_TABLE;
         SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
         db.execSQL(query);
+        DataBaseHelper.createTemptable(context);
     }
+
+    public static void updateProviosnalOffer(String packageName,String istalledStatus,Context ctx){
+        DataBaseHelper.init(ctx);
+        String query = "UPDATE "+DataBaseHelper.PRODUCT_TABLE+" SET App_Installed =? WHERE Package=?";
+        SQLiteDatabase db = DataBaseHelper.getSqliteDatabase();
+        SQLiteStatement statement = db.compileStatement(query);
+        statement.bindString(1, istalledStatus);
+        statement.bindString(2, packageName);
+        statement.execute();
+        statement.close();
+    }
+
 }

@@ -29,12 +29,12 @@ import java.io.File;
 
     private static final String SQL_CREATE_PRODUCT_INFO_TABLE = "CREATE TABLE IF NOT EXISTS "
             + PRODUCT_TABLE
-            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR,App_Insatlled VARCHAR DEFAULT false,Index VARCHAR)";
+            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR , App_Insatlled VARCHAR ,Index_app VARCHAR)";
 
 
     private static final String SQL_CREATE_PRODUCT_INFO_TEMP_TABLE = "CREATE TABLE IF NOT EXISTS "
             + PRODUCT_TABLE_TEMP
-            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR,App_Insatlled VARCHAR DEFAULT false,Index VARCHAR)";
+            + "(Type VARCHAR, Package VARCHAR, Label VARCHAR, Description VARCHAR, IconUrl VARCHAR, Url VARCHAR, Rating INTEGER, Developer VARCHAR , App_Insatlled VARCHAR ,Index_app VARCHAR)";
 
 
 
@@ -69,6 +69,12 @@ import java.io.File;
             sDbInstance.execSQL(SQL_CREATE_PRODUCT_INFO_TEMP_TABLE_COUNT);
             sDbInstance.close();
         }
+    }
+
+    public static void createTemptable(Context context) {
+            sDbInstance = context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+            sDbInstance.execSQL(SQL_CREATE_PRODUCT_INFO_TEMP_TABLE);
+            sDbInstance.close();
     }
 
     public static SQLiteDatabase getSqliteDatabase() {

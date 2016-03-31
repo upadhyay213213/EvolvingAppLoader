@@ -1,5 +1,6 @@
 package com.evolving.apploader.android.sdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
@@ -14,11 +15,16 @@ import com.evolving.apploader.android.sdk.api.ProvisionalOfferRequest;
 import com.evolving.apploader.android.sdk.database.DataBaseQuery;
 import com.evolving.apploader.android.sdk.model.AppDataUsage;
 import com.evolving.apploader.android.sdk.model.AppTotalData;
+import com.evolving.apploader.android.sdk.model.PorvisionalOfferGCM;
+import com.evolving.apploader.android.sdk.model.ProvisionOfferModel;
 import com.evolving.apploader.android.sdk.model.ProvisionalOffer;
+import com.evolving.apploader.android.sdk.model.ProvisonalOfferInnerGCM;
+import com.evolving.apploader.android.sdk.pushnotification.GCMClientManager;
 import com.evolving.apploader.android.sdk.services.RequestInitialConfigService;
 import com.evolving.apploader.android.sdk.util.AppLoaderConstants;
 import com.evolving.apploader.android.sdk.util.AppLoaderUtil;
 import com.evolving.apploader.android.sdk.util.SharedPreferenceUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,5 +110,39 @@ public class AppLoaderManager {
         return DataBaseQuery.getProvisionalOffer(context);
     }
 
+    public static void registerGCM(Context context , String projectID,String gcmTopic){
+        GCMClientManager gcmClientManager = new GCMClientManager(context,projectID,gcmTopic);
+        gcmClientManager.registerIfNeeded();
+    }
 
+    public static void getGCMMessage(String message){
+
+        getResponseFroGCM(message,mContext);
+    }
+
+    public static void getResponseFroGCM(String response,Context context) {
+        Gson gson = new Gson();
+        PorvisionalOfferGCM gCMProvisionalOffer=gson.fromJson(response,PorvisionalOfferGCM.class);
+        //Adding count to temp table
+        DataBaseQuery.addProductTableCount(Integer.parseInt(gCMProvisionalOffer.getResult()),context);
+
+        //Adding product to temp table
+        ArrayList<ProvisonalOfferInnerGCM> provisonalOfferInnerGCMs =gCMProvisionalOffer.getmProvisionalOffer();
+        for(int i=0; i<provisonalOfferInnerGCMs.size();i++ ){
+            ProvisionOfferModel mProvisionalOffer = new ProvisionOfferModel();
+            mProvisionalOffer.setmType(provisonalOfferInnerGCMs.get(i).getmType());
+            mProvisionalOffer.setmUrl(provisonalOfferInnerGCMs.get(i).getmURL());
+            mProvisionalOffer.setmPackage(provisonalOfferInnerGCMs.get(i).getmPackage());
+            mProvisionalOffer.setmIconUrl(provisonalOfferInnerGCMs.get(i).getmIconUrl());
+            mProvisionalOffer.setmDescription(provisonalOfferInnerGCMs.get(i).getmDescription());
+            mProvisionalOffer.setmRating(provisonalOfferInnerGCMs.get(i).getmRating());
+            mProvisionalOffer.setmDeveloper(provisonalOfferInnerGCMs.get(i).getmDeveloper());
+            mProvisionalOffer.setmLabel(provisonalOfferInnerGCMs.get(i).getmLabel());
+            mProvisionalOffer.setmIsAppInsatlled("false");
+            mProvisionalOffer.setmIndex(provisonalOfferInnerGCMs.get(i).getmIndex());
+            DataBaseQuery.addProductToTempDataBase(mProvisionalOffer, context);
+        }
+
+
+    }
 }

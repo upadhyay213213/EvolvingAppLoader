@@ -1,4 +1,4 @@
-package com.evolving.apploader.android.sdk.api;
+package com.evolving.apploader.android.sdk.model;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -7,18 +7,18 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by nupadhay on 3/23/2016.
+ * Created by nupadhay on 3/31/2016.
  */
-public class ProvisionalOfferResponse implements Parcelable {
+public class ProvisonalOfferInnerGCM  implements Parcelable {
 
-    static final Creator<ProvisionalOfferResponse> CREATOR
-            = new Creator<ProvisionalOfferResponse>() {
-        public ProvisionalOfferResponse createFromParcel(Parcel in) {
-            return new ProvisionalOfferResponse(in);
+    static final Creator<ProvisonalOfferInnerGCM> CREATOR
+            = new Creator<ProvisonalOfferInnerGCM>() {
+        public ProvisonalOfferInnerGCM createFromParcel(Parcel in) {
+            return new ProvisonalOfferInnerGCM(in);
         }
 
-        public ProvisionalOfferResponse[] newArray(int size) {
-            return new ProvisionalOfferResponse[size];
+        public ProvisonalOfferInnerGCM[] newArray(int size) {
+            return new ProvisonalOfferInnerGCM[size];
         }
     };
 
@@ -89,7 +89,7 @@ public class ProvisionalOfferResponse implements Parcelable {
     }
 
 
-    public ProvisionalOfferResponse(Parcel in) {
+    public ProvisonalOfferInnerGCM(Parcel in) {
         Bundle bundle = in.readBundle(getClass().getClassLoader());
         mType = bundle.getString(TYPE);
         mPackage = bundle.getString(PACKAGE);
